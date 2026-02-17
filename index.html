@@ -6,49 +6,57 @@
     <title>Beta Dağılımı Hesaplayıcısı</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* Tooltip stilleri */
+        /* Tooltip: Aşağı doğru açılacak şekilde ayarlandı */
         .tooltip { position: relative; display: inline-block; cursor: help; }
         .tooltip .tooltiptext {
-            visibility: hidden; width: 260px; background-color: #334155; color: #fff;
-            text-align: left; border-radius: 8px; padding: 12px; position: absolute;
-            z-index: 20; bottom: 125%; left: 50%; margin-left: -130px; opacity: 0;
-            transition: opacity 0.2s; font-size: 0.8rem; line-height: 1.4;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            visibility: hidden; width: 280px; background-color: #1e293b; color: #fff;
+            text-align: left; border-radius: 8px; padding: 14px; position: absolute;
+            z-index: 50; 
+            top: 150%; 
+            left: 50%; margin-left: -140px; 
+            opacity: 0;
+            transition: opacity 0.2s; font-size: 0.85rem; line-height: 1.5;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2);
+            border: 1px solid #334155;
+        }
+        .tooltip .tooltiptext::after {
+            content: ""; position: absolute; bottom: 100%; left: 50%;
+            margin-left: -5px; border-width: 5px; border-style: solid;
+            border-color: transparent transparent #1e293b transparent;
         }
         .tooltip:hover .tooltiptext { visibility: visible; opacity: 1; }
         
-        /* Tablo satır animasyonu */
-        .product-row { transition: all 0.2s ease-in-out; }
+        .product-row { transition: all 0.2s ease; }
     </style>
 </head>
-<body class="bg-gray-50 p-6 md:p-12 font-sans text-slate-900">
+<body class="bg-slate-50 p-4 md:p-12 font-sans text-slate-900">
     <div class="max-w-5xl mx-auto">
         
         <header class="mb-10 text-center">
             <h1 class="text-3xl font-extrabold text-indigo-700 tracking-tight">Beta Ürün Sıralayıcı</h1>
-            <p class="text-gray-500 mt-2 text-sm">Ürünleri Matematiksel Güven Aralığına Göre Objektif Olarak Sıralayın</p>
+            <p class="text-slate-500 mt-2 text-sm">Ürünleri Matematiksel Güven Aralığına Göre Objektif Olarak Sıralayın</p>
         </header>
 
-        <div class="bg-white p-6 rounded-2xl shadow-sm mb-8 grid grid-cols-1 md:grid-cols-2 gap-6 border border-gray-100">
+        <div class="bg-white p-6 rounded-2xl shadow-sm mb-8 grid grid-cols-1 md:grid-cols-2 gap-6 border border-slate-200">
             <div>
-                <label class="block text-xs font-bold text-gray-500 mb-2 uppercase tracking-widest">Puanlama Ölçeği (Maks Puan)</label>
-                <input type="number" id="maxScale" value="5" class="w-full p-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none font-semibold text-gray-700 transition-all">
+                <label class="block text-xs font-bold text-slate-500 mb-2 uppercase tracking-widest">Puanlama Ölçeği (Maks Puan)</label>
+                <input type="number" id="maxScale" value="5" class="w-full p-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none font-semibold text-gray-700 transition-all">
             </div>
             <div>
                 <div class="flex items-center gap-2 mb-2">
-                    <label class="text-xs font-bold text-gray-500 uppercase tracking-widest">Güven Seviyesi</label>
+                    <label class="text-xs font-bold text-slate-500 uppercase tracking-widest">Güven Seviyesi</label>
                     <div class="tooltip bg-indigo-100 text-indigo-600 w-5 h-5 flex items-center justify-center rounded-full text-[10px] font-black">
                         ?
                         <div class="tooltiptext">
-                            <strong class="text-indigo-200 block mb-2 pb-1 border-b border-white/10">Güven Seviyesi Ne İşe Yarar?</strong>
+                            <strong class="text-indigo-300 block mb-2 pb-1 border-b border-white/10">Güven Seviyesi Ne İşe Yarar?</strong>
                             Bu ayar, ürün puanı hesaplanırken <strong>değerlendiren sayısına</strong> ne kadar ağırlık verileceğini belirler:<br><br>
                             <strong>1. Derece:</strong> Ortalama puanı önceler. Az değerlendiren olmasını yeterli görür.<br><br>
-                            <strong>2. Derece (Dengeli):</strong> Puan ve değerlendiren sayısını ortak tartar. Genelde en iyisidir.<br><br>
-                            <strong>3. Derece:</strong> Veri sayısını önceler. Puanın kesinleşmesi için çok fazla değerlendiren arar.
+                            <strong>2. Derece (Dengeli):</strong> Puan ve değerlendiren sayısını ortak tartar.<br><br>
+                            <strong>3. Derece:</strong> Veri sayısını önceler. Puanın kesinleşmesi için daha fazla değerlendiren arar.
                         </div>
                     </div>
                 </div>
-                <select id="zScore" class="w-full p-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none cursor-pointer font-semibold text-gray-700 transition-all bg-white">
+                <select id="zScore" class="w-full p-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none cursor-pointer font-semibold text-gray-700 bg-white transition-all">
                     <option value="1">1. Derece (Puan Odaklı)</option>
                     <option value="1.96" selected>2. Derece (Dengeli)</option>
                     <option value="3">3. Derece (Veri Odaklı)</option>
@@ -56,147 +64,119 @@
             </div>
         </div>
 
-        <div class="bg-indigo-50 p-8 rounded-3xl shadow-sm mb-10 border border-indigo-100/50 relative overflow-hidden">
-            <div class="absolute top-0 right-0 -mt-4 -mr-4 w-24 h-24 bg-indigo-100 rounded-full opacity-50 blur-2xl pointer-events-none"></div>
-             <h3 class="font-bold mb-6 text-indigo-900 text-sm uppercase tracking-widest flex items-center gap-2">
+        <div class="bg-indigo-50 p-8 rounded-3xl shadow-sm mb-10 border border-indigo-100/50">
+             <h3 class="font-bold mb-6 text-indigo-900 text-xs uppercase tracking-widest flex items-center gap-2">
                 <span class="w-2 h-2 bg-indigo-500 rounded-full inline-block"></span>
                 Yeni Veri Girişi
             </h3>
             <div class="grid grid-cols-1 md:grid-cols-12 gap-4">
                 <div class="md:col-span-4">
-                     <input type="text" id="pName" placeholder="Ürün Adı (Opsiyonel)" class="w-full p-3 border border-indigo-100 rounded-xl shadow-sm focus:ring-2 focus:ring-indigo-500 outline-none transition-allbg-white">
+                     <input type="text" id="pName" placeholder="Ürün Adı (Opsiyonel)" class="w-full p-3 border border-indigo-100 rounded-xl shadow-sm focus:ring-2 focus:ring-indigo-500 outline-none transition-all bg-white">
                 </div>
                 <div class="md:col-span-3">
-                    <input type="number" id="pRating" step="0.1" placeholder="Puanı (Örn: 4.7)" class="w-full p-3 border border-indigo-100 rounded-xl shadow-sm focus:ring-2 focus:ring-indigo-500 outline-none transition-all bg-white">
+                    <input type="number" id="pRating" step="0.1" placeholder="Puanı (Örn: 4.5)" class="w-full p-3 border border-indigo-100 rounded-xl shadow-sm focus:ring-2 focus:ring-indigo-500 outline-none transition-all bg-white">
                 </div>
                 <div class="md:col-span-3">
                      <input type="number" id="pCount" placeholder="Değerlendiren Sayısı" class="w-full p-3 border border-indigo-100 rounded-xl shadow-sm focus:ring-2 focus:ring-indigo-500 outline-none transition-all bg-white">
                 </div>
                 <div class="md:col-span-2">
-                    <button onclick="addProduct()" class="w-full h-full bg-indigo-600 text-white font-bold p-3 rounded-xl hover:bg-indigo-700 transition-all active:scale-95 shadow-md shadow-indigo-200 flex items-center justify-center">
-                        HESAPLA
+                    <button onclick="addProduct()" class="w-full h-full bg-indigo-600 text-white font-black p-3 rounded-xl hover:bg-indigo-700 transition-all active:scale-95 shadow-md shadow-indigo-200">
+                        EKLE
                     </button>
                 </div>
             </div>
         </div>
 
-        <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
+        <div class="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden">
             <table class="w-full text-left border-collapse">
                 <thead>
-                    <tr class="bg-slate-50 text-slate-400 text-[10px] uppercase font-black tracking-widest border-b border-slate-100">
+                    <tr class="bg-slate-50 text-slate-400 text-[10px] uppercase font-black tracking-widest border-b border-slate-200">
                         <th class="p-5 text-center">#</th>
                         <th class="p-5 w-1/3">Ürün</th>
-                        <th class="p-5 text-center">Girilen Puan</th>
+                        <th class="p-5 text-center">Ham Puan</th>
                         <th class="p-5 text-center">Değerlendiren</th>
                         <th class="p-5 text-right text-indigo-700">Beta Skor</th>
                         <th class="p-5 text-center w-16"></th>
                     </tr>
                 </thead>
-                <tbody id="productTableBody" class="text-gray-700">
+                <tbody id="productTableBody" class="text-slate-700">
                     </tbody>
             </table>
-            
-            <div id="emptyState" class="text-center p-8 text-gray-400 text-sm hidden">
-                Henüz ürün eklenmedi. Yukarıdaki formdan veri girişi yapın.
+            <div id="emptyState" class="text-center p-12 text-slate-400 text-sm italic">
+                Sıralama yapmak için yukarıdaki formdan ürün verilerini girin.
             </div>
         </div>
     </div>
 
     <script>
-        // Ürünleri tutacağımız ana liste
         let products = [];
 
-        // Beta Dağılımı Alt Sınır Hesaplama Fonksiyonu
         function calculateBetaScore(rating, count, maxScale, z) {
             let alpha = (count * rating) + 1;
             let beta = (count * maxScale - count * rating) + 1;
             let n = alpha + beta;
             let mean = alpha / n;
             let variance = (alpha * beta) / (Math.pow(n, 2) * (n + 1));
-            let sd = Math.sqrt(variance);
-            return (mean - (z * sd)) * maxScale;
+            return (mean - (z * Math.sqrt(variance))) * maxScale;
         }
 
-        // Yeni ürün ekleme fonksiyonu
         function addProduct() {
-            const nameInput = document.getElementById('pName');
-            const ratingInput = document.getElementById('pRating');
-            const countInput = document.getElementById('pCount');
-
-            const name = nameInput.value.trim() || ("Ürün #" + (products.length + 1));
-            const rating = parseFloat(ratingInput.value);
-            const count = parseInt(countInput.value);
+            const nameInp = document.getElementById('pName');
+            const rateInp = document.getElementById('pRating');
+            const countInp = document.getElementById('pCount');
             const maxScale = parseFloat(document.getElementById('maxScale').value);
-            
-            if(isNaN(rating) || isNaN(count)) {
-                // Alanları kırmızı yapıp uyar
-                if(isNaN(rating)) ratingInput.classList.add('border-red-300', 'bg-red-50');
-                if(isNaN(count)) countInput.classList.add('border-red-300', 'bg-red-50');
-                setTimeout(() => {
-                    ratingInput.classList.remove('border-red-300', 'bg-red-50');
-                    countInput.classList.remove('border-red-300', 'bg-red-50');
-                }, 2000);
-                return;
-            }
+            const z = parseFloat(document.getElementById('zScore').value);
 
-            if(rating > maxScale) return alert(`Hata: Puan, belirlediğiniz ölçekten (${maxScale}) büyük olamaz.`);
-            if(rating < 0 || count < 0) return alert("Negatif değer giremezsiniz.");
+            const rating = parseFloat(rateInp.value);
+            const count = parseInt(countInp.value);
+            const name = nameInp.value.trim() || ("Ürün #" + (products.length + 1));
 
-            // Listeye ekle
+            if(isNaN(rating) || isNaN(count)) return alert("Lütfen puan ve değerlendiren sayısı girin.");
+            if(rating > maxScale) return alert("Hata: Puan ölçekten büyük olamaz.");
+
             products.push({ name, rating, count });
-            
-            // Tabloyu güncelle
             updateTable();
             
-            // Formu temizle ve isme odaklan
-            nameInput.value = "";
-            ratingInput.value = "";
-            countInput.value = "";
-            nameInput.focus();
+            nameInp.value = "";
+            rateInp.value = "";
+            countInp.value = "";
+            nameInp.focus();
         }
 
-        // Ürün silme fonksiyonu
         function deleteProduct(index) {
-            // Listeden o sıradaki ürünü çıkar (splice metodu)
             products.splice(index, 1);
-            // Tabloyu hemen güncelle
             updateTable();
         }
 
-        // Tabloyu çizme fonksiyonu
         function updateTable() {
             const z = parseFloat(document.getElementById('zScore').value);
             const maxScale = parseFloat(document.getElementById('maxScale').value);
             const tbody = document.getElementById('productTableBody');
-            const emptyState = document.getElementById('emptyState');
-            
-            // Boş durum kontrolü
+            const empty = document.getElementById('emptyState');
+
             if(products.length === 0) {
                 tbody.innerHTML = "";
-                emptyState.classList.remove('hidden');
+                empty.classList.remove('hidden');
                 return;
-            } else {
-                emptyState.classList.add('hidden');
             }
+            empty.classList.add('hidden');
 
-            // Puanları hesapla ve sırala
             products.forEach(p => p.betaScore = calculateBetaScore(p.rating, p.count, maxScale, z));
             products.sort((a, b) => b.betaScore - a.betaScore);
 
-            // HTML'i oluştur
             tbody.innerHTML = products.map((p, i) => `
-                <tr class="product-row border-b border-slate-50 hover:bg-indigo-50/40">
-                    <td class="p-5 font-bold text-gray-300 text-sm italic text-center">#${i + 1}</td>
+                <tr class="product-row border-b border-slate-100 hover:bg-slate-50/80 transition-colors">
+                    <td class="p-5 text-center font-bold text-slate-300">#${i + 1}</td>
                     <td class="p-5 font-bold text-slate-800">${p.name}</td>
-                    <td class="p-5 text-center font-medium">
-                        <span class="bg-slate-100 text-slate-600 px-2 py-1 rounded-md text-xs">${p.rating.toFixed(1)} / ${maxScale}</span>
-                    </td>
-                    <td class="p-5 text-center font-medium text-slate-500">${p.count.toLocaleString()}</td>
-                    <td class="p-5 text-right font-black text-indigo-700 text-xl tracking-tight">${p.betaScore.toFixed(3)}</td>
                     <td class="p-5 text-center">
-                        <button onclick="deleteProduct(${i})" class="group p-2 rounded-full hover:bg-red-50 transition-all" title="Bu ürünü sil">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-300 group-hover:text-red-500 transition-colors" viewBox="0 0 20 20" fill="currentColor">
-                                <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
+                        <span class="bg-slate-100 text-slate-600 px-2 py-1 rounded-lg text-xs font-bold">${p.rating.toFixed(1)}</span>
+                    </td>
+                    <td class="p-5 text-center font-medium text-slate-500 text-sm">${p.count.toLocaleString()}</td>
+                    <td class="p-5 text-right font-black text-indigo-700 text-xl tracking-tighter">${p.betaScore.toFixed(3)}</td>
+                    <td class="p-5 text-center">
+                        <button onclick="deleteProduct(${i})" class="text-slate-300 hover:text-red-500 transition-colors p-1" title="Sil">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                             </svg>
                         </button>
                     </td>
@@ -204,17 +184,8 @@
             `).join('');
         }
 
-        // Sayfa açıldığında ayar değişikliklerini dinle
         document.getElementById('zScore').addEventListener('change', updateTable);
         document.getElementById('maxScale').addEventListener('change', updateTable);
-        // Enter tuşu ile ekleme yapabilmek için
-        document.getElementById('pCount').addEventListener('keypress', function (e) {
-            if (e.key === 'Enter') addProduct();
-        });
-
-        // İlk açılışta boş tabloyu göster
-        updateTable();
     </script>
 </body>
 </html>
-
