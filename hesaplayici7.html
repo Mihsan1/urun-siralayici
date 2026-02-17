@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Beta Dağılımı Hesaplayıcısı</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .tooltip { position: relative; display: inline-block; cursor: help; }
+        .tooltip .tooltiptext {
+            visibility: hidden; width: 260px; background-color: #334155; color: #fff;
+            text-align: left; border-radius: 8px; padding: 12px; position: absolute;
+            z-index: 20; bottom: 125%; left: 50%; margin-left: -130px; opacity: 0;
+            transition: opacity 0.2s; font-size: 0.8rem; line-height: 1.4;
+        }
+        .tooltip:hover .tooltiptext { visibility: visible; opacity: 1; }
+    </style>
+</head>
+<body class="bg-gray-50 p-6 md:p-12 font-sans">
+    <div class="max-w-4xl mx-auto">
+        
+        <header class="mb-10 text-center">
+            <h1 class="text-3xl font-bold text-indigo-700">Beta Ürün Sıralayıcı</h1>
+            <p class="text-gray-500 mt-2 text-sm">Ürünleri matematiksel güven aralığına göre objektif olarak sıralayın.</p>
+        </header>
+
+        <div class="bg-white p-6 rounded-xl shadow-sm mb-8 grid grid-cols-1 md:grid-cols-2 gap-6 border border-gray-100">
+            <div>
+                <label class="block text-sm font-bold text-gray-700 mb-1">Puanlama Ölçeği (Maks Puan)</label>
+                <input type="number" id="maxScale" value="5" class="w-full p-2 border rounded focus:ring-2 focus:ring-indigo-300 outline-none">
+            </div>
+            <div>
+                <div class="flex items-center gap-2 mb-1">
+                    <label class="text-sm font-bold text-gray-700">Güven Seviyesi</label>
+                    <div class="tooltip bg-gray-200 text-gray-600 w-4 h-4 flex items-center justify-center rounded-full text-[10px] font-bold">
+                        ?
+                        <div class="tooltiptext">
+                            <strong>Güven Seviyesi Ne İşe Yarar?</strong><br><br>
+                            <strong>1. Derece:</strong> Ortalama puanı önceler. Az değerlendirmeyi yeterli görür.<br><br>
+                            <strong>2. Derece:</strong> Dengelidir. Puan ve kişi sayısını ortak tartar.<br><br>
+                            <strong>3. Derece:</strong> Veri sayısını önceler. Puanın kesinleşmesi için daha çok değerlendirme arar.
+                        </div>
+                    </div>
+                </div>
+                <select id="zScore" class="w-full p-2 border rounded focus:ring-2 focus:ring-indigo-300 outline-none cursor-pointer">
+                    <option value="1">1. Derece (Puan Odaklı)</option>
+                    <option value="1.96" selected>2. Derece (Dengeli)</option>
+                    <option value="3">3. Derece (Veri Odaklı)</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="bg-indigo-50 p-6 rounded-xl shadow-sm mb-8 border border-indigo-100">
+            <h3 class="font-bold mb-4 text-indigo-800 text-sm uppercase tracking-wider">Yeni Ürün Bilgisi</h3>
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <input type="text" id="pName" placeholder="Ürün Adı (Opsiyonel)" class="p-2 border rounded">
+                <input type="number" id="pRating" step="0.1" placeholder="Puanı (Örn: 4.2)" class="p-2 border rounded">
+                <input type="number" id="pCount" placeholder="Yorum Sayısı (Örn: 150)" class="p-2 border rounded">
+                <button onclick="addProduct()" class="bg-indigo-600 text-white font-bold py-2 rounded hover:bg-indigo-700 transition-colors">Listeye Ekle</button>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+            <table class="w-full text-left border-collapse">
+                <thead class="bg-gray-50 text-gray-600 text-xs uppercase font-bold">
+                    <tr>
+                        <th class="p-4 border-b">Sıra</th>
+                        <th class="p-4 border-b">Ürün</th>
+                        <th class="p-4 border-b text-center">Girilen Puan</th>
+                        <th class="p-4 border-b text-center">Yorum Sayısı</th>
+                        <th class="p-4 border-b text-right text-indigo-700 font-extrabold">Beta Skor</th>
+                    </tr>
+                </thead>
+                <tbody id="productTableBody" class="text-gray-700">
+                    </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        let products = [];
+
+        function calculateBetaScore(rating, count, maxScale, z) {
+            let alpha = (count * rating) + 1;
+            let beta = (count * maxScale - count * rating) + 1;
+            let n = alpha + beta;
+            let mean = alpha / n;
+            let variance = (alpha * beta) / (Math.pow(n, 2) * (n + 1));
+            return (mean - (z * Math.sqrt(variance))) * maxScale;
+        }
+
+        function addProduct() {
+            const name = document.getElementById('pName').value || ("Ürün #" + (products.length + 1));
+            const rating = parseFloat(document.getElementById('pRating').value);
+            const count = parseInt(document.getElementById('pCount').value);
+            const maxScale = parseFloat(document.getElementById('maxScale').value);
+            const z = parseFloat(document.getElementById('zScore').value);
+
+            if(isNaN(rating) || isNaN(count)) return alert("Lütfen puan ve yorum giriniz.");
+            if(rating > maxScale) return alert("Puan ölçekten büyük olamaz.");
+
+            products.push({ name, rating, count });
+            updateTable();
+            
+            document.getElementById('pName').value = "";
+            document.getElementById('pRating').value = "";
+            document.getElementById('pCount').value = "";
+        }
+
+        function updateTable() {
+            const z = parseFloat(document.getElementById('zScore').value);
+            const maxScale = parseFloat(document.getElementById('maxScale').value);
+            
+            products.forEach(p => p.betaScore = calculateBetaScore(p.rating, p.count, maxScale, z));
+            products.sort((a, b) => b.betaScore - a.betaScore);
+
+            const tbody = document.getElementById('productTableBody');
+            tbody.innerHTML = products.map((p, i) => `
+                <tr class="border-b hover:bg-gray-50 transition-colors">
+                    <td class="p-4 font-bold text-gray-400 text-sm">${i + 1}</td>
+                    <td class="p-4 font-semibold text-gray-800">${p.name}</td>
+                    <td class="p-4 text-center">${p.rating} / ${maxScale}</td>
+                    <td class="p-4 text-center">${p.count}</td>
+                    <td class="p-4 text-right font-bold text-indigo-600 text-lg">${p.betaScore.toFixed(3)}</td>
+                </tr>
+            `).join('');
+        }
+
+        document.getElementById('zScore').addEventListener('change', updateTable);
+        document.getElementById('maxScale').addEventListener('change', updateTable);
+    </script>
+</body>
+</html>
